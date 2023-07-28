@@ -8,7 +8,6 @@ function Main(props) {
   const [userDescription, setUserDescription] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
   const [cards, setCards] = useState([]);
-  const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -19,16 +18,16 @@ function Main(props) {
         setCards(initialCards);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        console.error("Error:", error);
       });
   }, []);
 
   function handleCardClick(card) {
-    setSelectedCard(card);
+    props.onCardClick(card);
   }
 
   function closeAllPopups() {
-    setSelectedCard(null);
+    props.onCloseAllPopups();
   }
 
   return (
@@ -41,7 +40,10 @@ function Main(props) {
               src={userAvatar}
               alt="аватар профиля"
             />
-            <button className="profile__avatar-edit-button" onClick={props.onEditAvatar}></button>
+            <button
+              className="profile__avatar-edit-button"
+              onClick={props.onEditAvatar}
+            ></button>
           </div>
           <div className="profile__info">
             <h1 className="profile__name">{userName}</h1>
@@ -66,7 +68,7 @@ function Main(props) {
           ))}
         </section>
       </main>
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <ImagePopup card={props.selectedCard} onClose={props.onCloseAllPopups} />
     </div>
   );
 }

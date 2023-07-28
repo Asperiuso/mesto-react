@@ -10,7 +10,9 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null); // Добавляем selectedCard
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [isImagePopupOpen, setImagePopupOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleEditProfileClick = () => {
     setEditProfilePopupOpen(true);
@@ -29,7 +31,9 @@ function App() {
   };
 
   const handleCardClick = (card) => {
-    setSelectedCard(card); 
+    setSelectedCard(card);
+    setImagePopupOpen(true);
+    setSelectedImage(card);
   };
 
   const closeAllPopups = () => {
@@ -37,7 +41,9 @@ function App() {
     setAddPlacePopupOpen(false);
     setEditAvatarPopupOpen(false);
     setDeletePopupOpen(false);
-    setSelectedCard(null); 
+    setSelectedCard(null);
+    setImagePopupOpen(false);
+    setSelectedImage(null);
   };
 
   return (
@@ -55,7 +61,7 @@ function App() {
 
         {/* Редактировать профиль */}
         {isEditProfilePopupOpen && (
-          <PopupWithForm title="Редактировать профиль" popupClassName="popup-edit" isOpen={isEditProfilePopupOpen} onClose={closeAllPopups}>
+          <PopupWithForm title="Редактировать профиль" popupClassName="popup-edit" isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} buttonText="Сохранить">
             <fieldset className="popup__input">
               <label className="popup__label">
                 <input
@@ -84,13 +90,12 @@ function App() {
                 <span className="popup__input-error-message" id="profileprofession-error"></span>
               </label>
             </fieldset>
-            <button className="popup__save-button" type="submit">Сохранить</button>
-          </PopupWithForm>
+            </PopupWithForm>
         )}
 
         {/* Новое место */}
         {isAddPlacePopupOpen && (
-          <PopupWithForm title="Новое место" popupClassName="popup-add" isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
+          <PopupWithForm title="Новое место" popupClassName="popup-add" isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} buttonText="Создать">
             <fieldset className="popup__input">
               <label className="popup__label">
                 <input
@@ -118,18 +123,12 @@ function App() {
                 <span className="popup__input-error-message" id="placelink-error"></span>
               </label>
             </fieldset>
-            <button className="popup__save-button" type="submit">Создать</button>
           </PopupWithForm>
-        )}
-
-        {/* Попап с изображением */}
-        {selectedCard && (
-          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
         )}
 
         {/* Обновить аватар */}
         {isEditAvatarPopupOpen && (
-          <PopupWithForm title="Обновить аватар" popupClassName="popup-avatar" isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups}>
+          <PopupWithForm title="Обновить аватар" popupClassName="popup-avatar" isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} buttonText="Сохранить">
             <fieldset className="popup__input">
               <label htmlFor="avatar" className="popup__label">
                 <input
@@ -142,14 +141,17 @@ function App() {
                 <span className="popup__input-error-message" id="avatar-error"></span>
               </label>
             </fieldset>
-            <button className="popup__save-button" type="submit">Сохранить</button>
-          </PopupWithForm>
+                    </PopupWithForm>
+        )}
+
+        {/* Попап с изображением */}
+        {isImagePopupOpen && selectedImage && (
+          <ImagePopup card={selectedImage} onClose={closeAllPopups} />
         )}
 
         {/* Попап для подтверждения удаления */}
         {isDeletePopupOpen && (
-          <PopupWithForm title="Вы уверены?" popupClassName="popup-delete" isOpen={isDeletePopupOpen} onClose={closeAllPopups}>
-            <button className="popup__save-button" type="submit">Да</button>
+          <PopupWithForm title="Вы уверены?" popupClassName="popup-delete" isOpen={isDeletePopupOpen} onClose={closeAllPopups} buttonText="Да">
           </PopupWithForm>
         )}
 

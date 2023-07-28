@@ -15,9 +15,9 @@ function Card({ card, onCardClick }) {
       />
       <div className="card__info">
         <h2 className="card__title">{card.name}</h2>
-        <div className="card__like-container">
+        <div className="card__likes-container">
           <button className="card__like-button"></button>
-          <span className="card__likes-counter">{card.likes.length}</span>
+          <span className="card__like-counter">{card.likes.length}</span>
         </div>
       </div>
       <button className="card__delete-button"></button>
