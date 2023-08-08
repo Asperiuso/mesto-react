@@ -30,19 +30,19 @@ class Api {
     );
   }
 
-  setUserInfo(userInfoObj) {
+  setUserInfo(data) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
-      body: JSON.stringify(userInfoObj),
+      body: JSON.stringify(data),
     }).then(this._handleResponse);
   }
 
-  addNewCard(cardDataObj) {
+  addNewCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       headers: this._headers,
-      body: JSON.stringify(cardDataObj),
+      body: JSON.stringify(data),
     }).then(this._handleResponse);
   }
 

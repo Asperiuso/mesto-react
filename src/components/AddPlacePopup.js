@@ -1,20 +1,32 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import PopupWithForm from './PopupWithForm';
 
-function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
-  const titleRef = useRef();
-  const linkRef = useRef();
+function AddPlacePopup({ onSubmit, isOpen, onClose }) {
+  const [name, setName] = useState("");
+  const [link, setLink] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    onAddPlace({
-      name: titleRef.current.value,
-      link: linkRef.current.value,
-    });
-    
-    onClose();
+  const handleNameChange = (e) => {
+    setName(e.target.value);
   }
+
+ const  handleLinkChange = (e) => {
+    setLink(e.target.value);
+  }
+
+  function handleSubmit(evt) {
+    evt.preventDefault();
+   
+    onSubmit({
+      name: name,
+      link: link,
+    });
+  }
+  useEffect(() => {
+    if (isOpen) {
+      setName("");
+      setLink("");
+    }
+  }, [isOpen]);
 
   return (
     <PopupWithForm
@@ -24,12 +36,13 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       title="Новое место"
       popupClassName="popup-add"
       buttonText="Создать"
+      name={"cards"}
+      form={"cards-form"}
     >
       <fieldset className="popup__input">
         <label className="popup__label">
           <input
             required
-            ref={titleRef}
             className="popup__input-item popup__input-item_cardTitle"
             id="placetitle"
             name="name"
@@ -37,19 +50,22 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
             placeholder="Название"
             minLength="2"
             maxLength="30"
+            onChange={handleNameChange}
+            value={name}
           />
           <span className="popup__input-error-message" id="placetitle-error"></span>
         </label>
         <label className="popup__label">
           <input
             required
-            ref={linkRef}
             className="popup__input-item popup__input-item_cardLink"
             id="placelink"
             name="link"
             type="url"
             placeholder="Ссылка на картинку"
             minLength="2"
+            onChange={handleLinkChange}
+            value={link}
           />
           <span className="popup__input-error-message" id="placelink-error"></span>
         </label>

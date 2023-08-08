@@ -5,23 +5,6 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function Main(props) {
   const currentUser = useContext(CurrentUserContext);
-
-  function handleCardClick(card) {
-    props.onCardClick(card);
-  }
-
-  // Функция для обработки лайка/дизлайка карточки
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((like) => like._id === currentUser._id);
-
-    // Вызываем функцию onCardLike, передавая ей объект карточки и флаг isLiked
-    props.onCardLike(card, isLiked);
-  }
-
-  function closeAllPopups() {
-    props.onCloseAllPopups();
-  }
-
   return (
     <div className="Main">
       <main className="content">
@@ -59,7 +42,7 @@ function Main(props) {
             <Card
               key={card._id}
               card={card}
-              onCardClick={handleCardClick}
+              onCardClick={props.onCardClick}
               onCardLike={props.onCardLike} 
               onCardDelete={props.onCardDelete} 
             />

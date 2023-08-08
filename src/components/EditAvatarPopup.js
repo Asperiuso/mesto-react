@@ -5,8 +5,8 @@ import PopupWithForm from './PopupWithForm';
 function EditAvatarPopup({ onUpdateAvatar, isOpen, onClose }) {
   const avatarRef = useRef();
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleSubmit(evt) {
+    evt.preventDefault();
 
     onUpdateAvatar({
       avatar: avatarRef.current.value,
@@ -37,6 +37,7 @@ function EditAvatarPopup({ onUpdateAvatar, isOpen, onClose }) {
             className="popup__input-item popup__input-item_avatar"
             type="url"
             id="avatar"
+            minLength="2"
             placeholder="Ссылка на аватар"
           />
           <span className="popup__input-error-message" id="avatar-error"></span>

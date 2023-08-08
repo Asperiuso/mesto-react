@@ -5,14 +5,14 @@ import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
 import EditProfilePopup from './EditProfilePopup';
 import ImagePopup from './ImagePopup';
-import { CurrentUserContext } from "../context/CurrentUserContext.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import api from "../utils/Api";
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
-  const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -21,28 +21,43 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
 
-  const handleCardLike = (card, isLiked) => {
-    const method = isLiked ? 'dislike' : 'like';
-
-    api[method](card._id)
-      .then(newCard => {
-        setCards(state => state.map(c => c._id === card._id ? newCard : c));
-      })
-      .catch(error => {
-        console.error("Ошибка при обновлении лайка карточки:", error);
-      });
+  const handleEditProfileClick = () => {
+    setEditProfilePopupOpen(true);
   };
 
-  const handleUpdateUser = ({ name, about }) => {
-    api.setUserInfo({ name, about })
-      .then(updatedUser => {
-        setCurrentUser(updatedUser);
-        closeAllPopups();
-      })
-      .catch(error => {
-        console.error("Ошибка при обновлении информации о пользователе:", error);
-      });
+  const handleAddPlaceClick = () => {
+    setIsAddPlacePopupOpen(true);
+  }
+
+  const handleEditAvatarClick = () => {
+    setEditAvatarPopupOpen(true);
   };
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card);
+    setImagePopupOpen(true);
+    setSelectedImage(card);
+  };
+
+  const closeAllPopups = () => {
+    setEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setEditAvatarPopupOpen(false);
+    setDeletePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setSelectedCard(null);
+    setImagePopupOpen(false);
+    setSelectedImage(null);
+  };
+
+  useEffect(() => {
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([user, cards]) => {
+        setCurrentUser(user);
+        setCards(cards);
+      })
+      .catch((error) => console.log("Ошибка при загрузке информации", error));
+  }, []);
 
   const handleUpdateAvatar = ({ avatar }) => {
     api.setUserAvatar({ avatar })
@@ -65,66 +80,39 @@ function App() {
       });
   };
 
+  const handleCardLike = (card, isLiked) => {
+    const method = isLiked ? 'dislike' : 'like';
 
-  useEffect(() => {
-    // Загрузка информации о пользователе с сервера
-    api.getUserInfo()
-      .then(data => {
-        setCurrentUser(data);
+    api[method](card._id)
+      .then(newCard => {
+        setCards(state => state.map(c => c._id === card._id ? newCard : c));
       })
       .catch(error => {
-        console.error("Ошибка при загрузке информации о пользователе:", error);
+        console.error("Ошибка при обновлении лайка карточки:", error);
       });
+  };
 
-    // Загрузка карточек с сервера
-    api.getCardList()
-      .then(data => {
-        setCards(data);
+  const handleUpdateUser = (data) => {
+    api
+      .setUserInfo(data)
+      .then((newUser) => {
+        setCurrentUser(newUser);
+        closeAllPopups();
       })
-      .catch(error => {
-        console.error("Ошибка при загрузке карточек:", error);
-      });
-  }, []);
-
-  const handleEditProfileClick = () => {
-    setEditProfilePopupOpen(true);
+      .catch((err) => console.log("Ошибка при обновлении данных пользователя", err));
   };
 
-  const handleEditAvatarClick = () => {
-    setEditAvatarPopupOpen(true);
-  };
-
-  const handleDeleteClick = () => {
-    setDeletePopupOpen(true);
-  };
-
-  const handleCardClick = (card) => {
-    setSelectedCard(card);
-    setImagePopupOpen(true);
-    setSelectedImage(card);
-  };
-
-  const closeAllPopups = () => {
-    setEditProfilePopupOpen(false);
-    setAddPlacePopupOpen(false);
-    setEditAvatarPopupOpen(false);
-    setDeletePopupOpen(false);
-    setSelectedCard(null);
-    setImagePopupOpen(false);
-    setSelectedImage(null);
-  };
-
-  const handleAddPlaceSubmit = (newCard) => {
-    api.addCard(newCard)
-      .then((addedCard) => {
-        setCards([addedCard, ...cards]);
+  const handleAddPlaceSubmit = (data) => {
+    console.log(data);
+    api.addNewCard(data)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
         closeAllPopups();
       })
       .catch(error => {
         console.error("Ошибка при добавлении карточки:", error);
       });
   };
-
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="root">
@@ -132,9 +120,8 @@ function App() {
           <Header />
           <Main
             onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceSubmit}
+            onAddPlace={handleAddPlaceClick}
             onEditAvatar={handleEditAvatarClick}
-            onDelete={handleDeleteClick}
             onCardClick={handleCardClick}
             cards={cards}
             onCardLike={handleCardLike}
@@ -143,31 +130,27 @@ function App() {
           <Footer />
 
           {/* Редактировать профиль */}
-          {isEditProfilePopupOpen && (
-            <EditProfilePopup
-              isOpen={isEditProfilePopupOpen}
-              onClose={closeAllPopups}
-              onUpdateUser={handleUpdateUser}
-            />
-          )}
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateUser}
+          />
+
 
           {/* Новое место */}
-          {isAddPlacePopupOpen && (
-            <AddPlacePopup
-              isOpen={isAddPlacePopupOpen}
-              onClose={closeAllPopups}
-              onAddPlace={handleAddPlaceSubmit}
-            />
-          )}
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onSubmit={handleAddPlaceSubmit}
+          />
 
           {/* Обновить аватар */}
-          {isEditAvatarPopupOpen && (
-            <EditAvatarPopup
-              isOpen={isEditAvatarPopupOpen}
-              onClose={closeAllPopups}
-              onUpdateAvatar={handleUpdateAvatar}
-            />
-          )}
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
+
 
           {/* Попап с изображением */}
           {isImagePopupOpen && selectedImage && (
