@@ -15,7 +15,6 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
   const [isImagePopupOpen, setImagePopupOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentUser, setCurrentUser] = useState({});
@@ -34,7 +33,6 @@ function App() {
   };
 
   const handleCardClick = (card) => {
-    setSelectedCard(card);
     setImagePopupOpen(true);
     setSelectedImage(card);
   };
@@ -45,7 +43,6 @@ function App() {
     setEditAvatarPopupOpen(false);
     setDeletePopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    setSelectedCard(null);
     setImagePopupOpen(false);
     setSelectedImage(null);
   };
